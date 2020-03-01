@@ -1,0 +1,1189 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Анализатор
+{
+    class Class1
+    {
+       
+        enum State { S, F, E, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, A40, A41, A42, A43, A44 }
+        
+        public static Result Start(string s)
+        {
+         string st;
+        string sthelp = "", sth="";
+        char ch;
+            int init=-50000, final=-50000;
+            Result res = new Result();
+            State sta;
+         int i, ii, ic, ihelp = 0;
+            st = s.ToLower() + "@";
+            sta = State.S;
+            i = 0; ii = 0; ic = 0; ihelp = 0;
+            while ((sta != State.F) && (sta != State.E) && (i < st.Length))
+            {
+                ch = st[i]; i++;
+                switch (sta)
+                {
+                    case State.S:
+                        if (ch == ' ') break;
+                        if (ch == 'f') sta = State.A1;
+                        else
+                        {
+                            sta = State.E;
+                            res.textBox3 = "Ожидалось служебное слово for";
+                            res.error = true;
+                            sthelp = ""; ihelp = 0;
+                            res.i = i;
+                            res.textBox6 = true;
+                            return res;
+                        }
+                        break;
+                    case State.A1:
+                        if (ch == 'o') sta = State.A2;
+                        else
+                        {
+                            sta = State.E;
+                            res.textBox3 = "Ожидалось служебное слово for";
+                            res.error = true;
+                            sthelp = ""; ihelp = 0;
+                            res.i = i;
+                            res.textBox6 = true;
+                            return res;
+                        }
+                        break;
+                    case State.A2:
+                        if (ch == 'r') sta = State.A3;
+                        else
+                        {
+                            sta = State.E;
+                            res.textBox3 = "Ожидалось служебное слово for";
+                            res.error = true;
+                            sthelp = ""; ihelp = 0;
+                            res.i = i;
+                            res.textBox6 = true;
+                            return res;
+                        }
+                        break;
+                    case State.A3:
+                        if (ch == ' ') sta = State.A4;
+                        else
+                        {
+                            sta = State.E;
+                            res.i = i;
+                            res.textBox3 = "После служебного слова ожидался пробел";
+                            sthelp = ""; ihelp = 0;
+                            res.textBox6 = true;
+                            return res;
+                        }
+                        break;
+                    case State.A4:
+                        if (ch == ' ') break;
+                        if ((ch == '_') || (ch >= 'a' && ch <= 'z'))
+                        {
+                            sta = State.A5; ihelp++;
+                            sthelp += ch;
+                        }
+                        else
+                        {
+                            sta = State.E;
+                            res.textBox3 = "Идентификатор должен начинаться с буквы или знака подчеркивания";
+                            res.error = true;
+                            sthelp = ""; ihelp = 0;
+                            res.i = i;
+                            res.textBox6 = true;
+                            return res;
+                        }
+                        break;
+                    case State.A5:
+                        if ((ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'z') || (ch == '_') || ch == ' ' || ch == ':')
+                        {
+                            if ((ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'z') || (ch == '_')) { ihelp++; sthelp += ch; }
+                            if (ihelp > 8)
+                            {
+                                sta = State.E;
+                                res.textBox3 = "Размер идентификатора не должен превышать 8 символов";
+                                res.error = true;
+                                sthelp = ""; ihelp = 0;
+                                res.i = i;
+                                res.textBox6 = true;
+                                return res;
+                            }
+
+                            if (ch == ' ')
+                            {
+                                if (sthelp == "for" || sthelp == "div" || sthelp == "to" || sthelp == "downto" || sthelp == "do" || sthelp == "mod")
+                                {
+                                    sta = State.E;
+                                    res.textBox3 = "Идентификатор не может быть зарезервированным словом";
+                                    res.error = true;
+                                    sthelp = ""; ihelp = 0;
+                                    res.i = i;
+                                    res.textBox6 = true;
+                                    return res;
+                                }
+                                else
+                                {
+                                    sta = State.A6; sthelp = ""; ihelp = 0; ii++;
+                                }
+                            }
+                            if (ch == ':')
+                            {
+                                if (sthelp == "for" || sthelp == "div" || sthelp == "to" || sthelp == "downto" || sthelp == "do" || sthelp == "mod")
+                                {
+                                    sta = State.E;
+                                    res.textBox3 = "Идентификатор не может быть зарезервированным словом";
+                                    res.error = true;
+                                    sthelp = ""; ihelp = 0;
+                                    res.i = i;
+                                    res.textBox6 = true;
+                                    return res;
+                                }
+                                else
+                                {
+                                    sta = State.A7; sthelp = ""; ihelp = 0; ii++;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            sta = State.E;
+                            res.textBox3 = "Недопустимый символ";
+                            res.error = true;
+                            sthelp = ""; ihelp = 0;
+                            res.i = i;
+                            res.textBox6 = true;
+                            return res;
+                        }
+                        break;
+                    case State.A6:
+                        if (ch == ' ') break;
+                        if (ch == ':') sta = State.A7;
+                        else
+                        {
+                            sta = State.E;
+                            res.textBox3 = "Недопустимый символ";
+                            res.error = true;
+                            sthelp = ""; ihelp = 0;
+                            res.i = i;
+                            res.textBox6 = true;
+                            return res;
+                        }
+                        break;
+                    case State.A7:
+                        if (ch == '=') sta = State.A8;
+                        else
+                        {
+                            sta = State.E;
+                            res.textBox3 = "Недопустимый символ";
+                            res.error = true;
+                            sthelp = ""; ihelp = 0;
+                            res.i = i;
+                            res.textBox6 = true;
+                            return res;
+                        }
+                        break;
+                    case State.A8:
+                        if (ch == ' ') break;
+                        if ((ch == '_') || (ch >= 'a' && ch <= 'z')) { sta = State.A9; ihelp++; sthelp += ch; break; }
+                        if (ch >= '0' && ch <= '9') { sta = State.A11; sthelp += ch; break; }
+                        if (ch == '-') { sta = State.A12; sthelp += ch; break; }
+                        else
+                        {
+                            sta = State.E;
+                            res.textBox3 = "Ожидался идентификатор или константа";
+                            res.error = true;
+                            sthelp = ""; ihelp = 0;
+                            res.i = i;
+                            res.textBox6 = true;
+                            return res;
+                        }
+                    case State.A9:
+                        if ((ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'z') || (ch == '_') || ch == ' ')
+                        {
+                            if ((ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'z') || (ch == '_')) { ihelp++; sthelp += ch; }
+                            if (ihelp > 8)
+                            {
+                                sta = State.E;
+                                res.textBox3 = "Размер идентификатора не должен превышать 8 символов";
+                                res.error = true;
+                                sthelp = ""; ihelp = 0;
+                                res.i = i;
+                                res.textBox6 = true;
+                                return res;
+                            }
+
+                            if (ch == ' ')
+                            {
+                                if (sthelp == "for" || sthelp == "div" || sthelp == "to" || sthelp == "downto" || sthelp == "do" || sthelp == "mod")
+                                {
+                                    sta = State.E;
+                                    res.textBox3 = "Идентификатор не может быть зарезервированным словом";
+                                    res.error = true;
+                                    sthelp = ""; ihelp = 0;
+                                    res.i = i;
+                                    res.textBox6 = true;
+                                    return res;
+                                }
+                                else
+                                {
+                                    sta = State.A10; sthelp = ""; ihelp = 0; ii++;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            sta = State.E;
+                            res.textBox3 = "Недопустимый символ";
+                            res.error = true;
+                            sthelp = ""; ihelp = 0;
+                            res.i = i;
+                            res.textBox6 = true;
+                            return res;
+                        }
+                        break;
+                    case State.A10:
+                        if (ch == ' ') break;
+                        if (ch == 't') { sth += 't'; sta = State.A18; break; }
+                        if (ch == 'd') { sth += 'd'; sta = State.A14; }
+                        else
+                        {
+                            sta = State.E;
+                            res.textBox3 = "Ожидалось служебное слово to или downto";
+                            res.error = true;
+                            sthelp = ""; ihelp = 0;
+                            res.i = i;
+                            res.textBox6 = true;
+                            return res;
+                        }
+                        break;
+                    case State.A11:
+                        if (ch >= '0' && ch <= '9') { sthelp += ch; break; }
+                        if (ch == ' ')
+                        {
+                            if (sthelp.Length <= 7)
+                            {
+                                if (Int32.Parse(sthelp) >= -32768 && Int32.Parse(sthelp) <= 32767)//!!
+                                {
+                                    init = Int32.Parse(sthelp);
+                                    sta = State.A13; sthelp = ""; ic++;
+                                }
+                                else
+                                {
+                                    sta = State.E;
+                                    res.textBox3 = "Недопустимое константное выражение";
+                                    res.error = true;
+                                    sthelp = ""; ihelp = 0;
+                                    res.i = i;
+                                    res.textBox6 = true;
+                                    return res;
+                                }
+                            }
+                            else
+                            {
+                                sta = State.E;
+                                res.textBox3 = "Недопустимое константное выражение";
+                                res.error = true;
+                                sthelp = ""; ihelp = 0;
+                                res.i = i;
+                                res.textBox6 = true;
+                                return res;
+                            }
+                        }
+                        else
+                        {
+                            sta = State.E;
+                            res.textBox3 = "Символ не может содержаться в константном выражении";
+                            res.error = true;
+                            sthelp = ""; ihelp = 0;
+                            res.i = i;
+                            res.textBox6 = true;
+                            return res;
+                        }
+                        break;
+                    case State.A12:
+                        if (ch >= '0' && ch <= '9') { sthelp += ch; sta = State.A11; }
+                        else
+                        {
+                            sta = State.E;
+                            res.textBox3 = "Символ не может содержаться в константном выражении";
+                            res.error = true;
+                            sthelp = ""; ihelp = 0;
+                            res.i = i;
+                            res.textBox6 = true;
+                            return res;
+                        }
+                        break;
+                    case State.A13:
+                        if (ch == ' ') break;
+                        if (ch == 't') { sth += 't'; sta = State.A18; break; }
+                        if (ch == 'd') { sth += 'd'; sta = State.A14; }
+                        else
+                        {
+                            sta = State.E;
+                            res.textBox3 = "Ожидалось служебное слово to или downto";
+                            res.error = true;
+                            sthelp = ""; ihelp = 0;
+                            res.i = i;
+                            res.textBox6 = true;
+                            return res;
+                        }
+                        break;
+                    case State.A14:
+                        if (ch == 'o') { sth += 'o'; sta = State.A15; }
+                        else
+                        {
+                            sta = State.E;
+                            res.textBox3 = "Ожидалось служебное слово downto";
+                            res.error = true;
+                            sthelp = ""; ihelp = 0;
+                            res.i = i;
+                            res.textBox6 = true;
+                            return res;
+                        }
+                        break;
+                    case State.A15:
+                        if (ch == 'w') { sth += 'w'; sta = State.A16; }
+                        else
+                        {
+                            sta = State.E;
+                            res.textBox3 = "Ожидалось служебное слово downto";
+                            res.error = true;
+                            sthelp = ""; ihelp = 0;
+                            res.i = i;
+                            res.textBox6 = true;
+                            return res;
+                        }
+                        break;
+                    case State.A16:
+                        if (ch == 'n') { sth += 'n'; sta = State.A17; }
+                        else
+                        {
+                            sta = State.E;
+                            res.textBox3 = "Ожидалось служебное слово downto";
+                            res.error = true;
+                            sthelp = ""; ihelp = 0;
+                            res.i = i;
+                            res.textBox6 = true;
+                            return res;
+                        }
+                        break;
+                    case State.A17:
+                        if (ch == 't') { sth += 't'; sta = State.A18; }
+                        else
+                        {
+                            sta = State.E;
+                            res.textBox3 = "Ожидалось служебное слово downto";
+                            res.error = true;
+                            sthelp = ""; ihelp = 0;
+                            res.i = i;
+                            res.textBox6 = true;
+                            return res;
+                        }
+                        break;
+                    case State.A18:
+                        if (ch == 'o') { sth += 'o'; sta = State.A19; }
+                        else
+                        {
+                            sta = State.E;
+                            res.textBox3 = "Ожидалось служебное слово downto или to";
+                            res.error = true;
+                            sthelp = ""; ihelp = 0;
+                            res.i = i;
+                            res.textBox6 = true;
+                            return res;
+                        }
+                        break;
+                    case State.A19:
+                        if (ch == ' ') sta = State.A20;
+                        else
+                        {
+                            sta = State.E;
+                            res.textBox3 = "После служебного слова ожидался пробел";
+                            res.error = true;
+                            sthelp = ""; ihelp = 0;
+                            res.i = i;
+                            res.textBox6 = true;
+                            return res;
+                        }
+                        break;
+                    case State.A20:
+                        if (ch == ' ') break;
+                        if ((ch == '_') || (ch >= 'a' && ch <= 'z')) { sta = State.A22; ihelp++; sthelp += ch; break; }
+                        if (ch >= '0' && ch <= '9') { sta = State.A23; sthelp += ch; break; }
+                        if (ch == '-' || ch == '+') { sta = State.A21; sthelp += ch; } // Тут добавлено sthelp += ch;
+                        else
+                        {
+                            sta = State.E;
+                            res.textBox3 = "Ожидался идентификатор или константа";
+                            res.error = true;
+                            sthelp = ""; ihelp = 0;
+                            res.i = i;
+                            res.textBox6 = true;
+                            return res;
+                        }
+                        break;
+                    case State.A21:
+                        if (ch == ' ') break;
+                        if ((ch == '_') || (ch >= 'a' && ch <= 'z')) { sta = State.A22; ihelp++; sthelp += ch; break; }
+                        if (ch >= '0' && ch <= '9') { sta = State.A23; sthelp += ch; }
+                        else
+                        {
+                            sta = State.E;
+                            res.textBox3 = "Ожидался идентификатор или константа";
+                            res.error = true;
+                            sthelp = ""; ihelp = 0;
+                            res.i = i;
+                            res.textBox6 = true;
+                            return res;
+                        }
+                        break;
+                    case State.A22:
+                        if ((ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'z') || (ch == '_') || ch == ' ' || ch == '+' || ch == '-' || ch == '*' || ch == '/')
+                        {
+                            if ((ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'z') || (ch == '_')) { ihelp++; sthelp += ch; }
+                            if (ihelp > 8)
+                            {
+                                sta = State.E;
+                                res.textBox3 = "Размер идентификатора не должен превышать 8 символов";
+                                res.error = true;
+                                sthelp = ""; ihelp = 0;
+                                res.i = i;
+                                res.textBox6 = true;
+                                return res;
+                            }
+
+                            if (ch == ' ')
+                            {
+                                if (sthelp == "for" || sthelp == "div" || sthelp == "to" || sthelp == "downto" || sthelp == "do" || sthelp == "mod")
+                                {
+                                    sta = State.E;
+                                    res.textBox3 = "Идентификатор не может быть зарезервированным словом";
+                                    res.error = true;
+                                    sthelp = ""; ihelp = 0;
+                                    res.i = i;
+                                    res.textBox6 = true;
+                                    return res;
+                                }
+                                else
+                                {
+                                    sta = State.A24; sthelp = ""; ihelp = 0; ii++;
+                                }
+                            }
+                            if (ch == '+' || ch == '-' || ch == '*' || ch == '/')
+                            {
+                                if (sthelp == "for" || sthelp == "div" || sthelp == "to" || sthelp == "downto" || sthelp == "do" || sthelp == "mod")
+                                {
+                                    sta = State.E;
+                                    res.textBox3 = "Идентификатор не может быть зарезервированным словом";
+                                    res.error = true;
+                                    sthelp = ""; ihelp = 0;
+                                    res.i = i;
+                                    res.textBox6 = true;
+                                    return res;
+                                }
+                                else
+                                {
+                                    sta = State.A21; sthelp = ""; ihelp = 0; ii++;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            sta = State.E;
+                            res.textBox3 = "Недопустимый символ";
+                            res.error = true;
+                            sthelp = ""; ihelp = 0;
+                            res.i = i;
+                            res.textBox6 = true;
+                            return res;
+                        }
+                        break;
+                    case State.A23:
+                        if (ch >= '0' && ch <= '9') { sthelp += ch; break; }
+                        if (ch == ' ')
+                        {
+                            if (sthelp.Length <= 7)
+                            {
+                                if (Int32.Parse(sthelp) >= -65532 && Int32.Parse(sthelp) <= 65535)// Изменение... Вместо -65532 стоял 0
+                                {
+                                    final = Int32.Parse(sthelp);
+                                    sta = State.A24; sthelp = ""; ic++;
+                                }
+                                else
+                                {
+                                    sta = State.E;
+                                    res.textBox3 = "Недопустимое константное выражение";
+                                    res.error = true;
+                                    sthelp = ""; ihelp = 0;
+                                    res.i = i;
+                                    res.textBox6 = true;
+                                    return res;
+                                }
+                            }
+                            else
+                            {
+                                sta = State.E;
+                                res.textBox3 = "Недопустимое константное выражение";
+                                res.error = true;
+                                sthelp = ""; ihelp = 0;
+                                res.i = i;
+                                res.textBox6 = true;
+                                return res;
+                            }
+                            break;
+                        }
+                        if (ch == '+' || ch == '-' || ch == '*' || ch == '/')
+                        {
+                            if (sthelp.Length <= 7)
+                            {
+                                if (Int32.Parse(sthelp) >= 0 && Int32.Parse(sthelp) <= 65535)
+                                {
+                                    sta = State.A21; sthelp = ""; ic++;
+                                }
+                                else
+                                {
+                                    sta = State.E;
+                                    res.textBox3 = "Недопустимое константное выражение";
+                                    res.error = true;
+                                    sthelp = ""; ihelp = 0;
+                                    res.i = i;
+                                    res.textBox6 = true;
+                                    return res;
+                                }
+                            }
+                            else
+                            {
+                                sta = State.E;
+                                res.textBox3 = "Недопустимое константное выражение";
+                                res.error = true;
+                                sthelp = ""; ihelp = 0;
+                                res.i = i;
+                                res.textBox6 = true;
+                                return res;
+                            }
+                        }
+                        else
+                        {
+                            sta = State.E;
+                            res.textBox3 = "Символ не может содержаться в константном выражении";
+                            res.error = true;
+                            sthelp = ""; ihelp = 0;
+                            res.i = i;
+                            res.textBox6 = true;
+                            return res;
+                        }
+                        break;
+                    case State.A24:
+                        if (ch == ' ') break;
+                        if (ch == 'm') { sta = State.A25; break; }
+                        if (ch == 'd') { sta = State.A28; break; }
+                        if (ch == '+' || ch == '-' || ch == '*' || ch == '/') sta = State.A21;
+                        else
+                        {
+                            sta = State.E;
+                            res.textBox3 = "Ожидался оператор mod или div или служебное слово do";
+                            res.error = true;
+                            sthelp = ""; ihelp = 0;
+                            res.i = i;
+                            res.textBox6 = true;
+                            return res;
+                        }
+                        break;
+                    case State.A25:
+                        if (ch == 'o') sta = State.A26;
+                        else
+                        {
+                            sta = State.E;
+                            res.textBox3 = "Ожидался оператор mod";
+                            res.error = true;
+                            sthelp = ""; ihelp = 0;
+                            res.i = i;
+                            res.textBox6 = true;
+                            return res;
+                        }
+                        break;
+                    case State.A26:
+                        if (ch == 'd') sta = State.A27;
+                        else
+                        {
+                            sta = State.E;
+                            res.textBox3 = "Ожидался оператор mod";
+                            res.error = true;
+                            sthelp = ""; ihelp = 0;
+                            res.i = i;
+                            res.textBox6 = true;
+                            return res;
+                        }
+                        break;
+                    case State.A27:
+                        if (ch == ' ') sta = State.A21;
+                        else
+                        {
+                            sta = State.E;
+                            res.textBox3 = "После служебного слова ожидался пробел";
+                            res.error = true;
+                            sthelp = ""; ihelp = 0;
+                            res.i = i;
+                            res.textBox6 = true;
+                            return res;
+                        }
+                        break;
+                    case State.A28:
+                        if (ch == 'i') { sta = State.A29; break; }
+                        if (ch == 'o') sta = State.A30;
+                        else
+                        {
+                            sta = State.E;
+                            res.textBox3 = "Ожидался оператор div или служебное слово do";
+                            res.error = true;
+                            sthelp = ""; ihelp = 0;
+                            res.i = i;
+                            res.textBox6 = true;
+                            return res;
+                        }
+                        break;
+                    case State.A29:
+                        if (ch == 'v') sta = State.A27;
+                        else
+                        {
+                            sta = State.E;
+                            res.textBox3 = "Ожидался оператор div";
+                            res.error = true;
+                            sthelp = ""; ihelp = 0;
+                            res.i = i;
+                            res.textBox6 = true;
+                            return res;
+                        }
+                        break;
+                    case State.A30:
+                        if (ch == ' ') sta = State.A31;
+                        else
+                        {
+                            sta = State.E;
+                            res.textBox3 = "После служебного слова ожидался пробел";
+                            res.error = true;
+                            sthelp = ""; ihelp = 0;
+                            res.i = i;
+                            res.textBox6 = true;
+                            return res;
+                        }
+                        break;
+                    case State.A31:
+                        if (ch == ' ') break;
+                        if ((ch == '_') || (ch >= 'a' && ch <= 'z'))
+                        {
+                            sta = State.A32; ihelp++;
+                            sthelp += ch;
+                        }
+                        else
+                        {
+                            sta = State.E;
+                            res.textBox3 = "Идентификатор должен начинаться с буквы или знака подчеркивания";
+                            res.error = true;
+                            sthelp = ""; ihelp = 0;
+                            res.i = i;
+                            res.textBox6 = true;
+                            return res;
+                        }
+                        break;
+                    case State.A32:
+                        if ((ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'z') || (ch == '_') || ch == ' ' || ch == ':')
+                        {
+                            if ((ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'z') || (ch == '_')) { ihelp++; sthelp += ch; }
+                            if (ihelp > 8)
+                            {
+                                sta = State.E;
+                                res.textBox3 = "Размер идентификатора не должен превышать 8 символов";
+                                res.error = true;
+                                sthelp = ""; ihelp = 0;
+                                res.i = i;
+                                res.textBox6 = true;
+                                return res;
+                            }
+
+                            if (ch == ' ')
+                            {
+                                if (sthelp == "for" || sthelp == "div" || sthelp == "to" || sthelp == "downto" || sthelp == "do" || sthelp == "mod")
+                                {
+                                    sta = State.E;
+                                    res.textBox3 = "Идентификатор не может быть зарезервированным словом";
+                                    res.error = true;
+                                    sthelp = ""; ihelp = 0;
+                                    res.i = i;
+                                    res.textBox6 = true;
+                                    return res;
+                                }
+                                else
+                                {
+                                    sta = State.A33; sthelp = ""; ihelp = 0; ii++;
+                                }
+                            }
+                            if (ch == ':')
+                            {
+                                if (sthelp == "for" || sthelp == "div" || sthelp == "to" || sthelp == "downto" || sthelp == "do" || sthelp == "mod")
+                                {
+                                    sta = State.E;
+                                    res.textBox3 = "Идентификатор не может быть зарезервированным словом";
+                                    res.error = true;
+                                    sthelp = ""; ihelp = 0;
+                                    res.i = i;
+                                    res.textBox6 = true;
+                                    return res;
+                                }
+                                else
+                                {
+                                    sta = State.A34; sthelp = ""; ihelp = 0; ii++;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            sta = State.E;
+                            res.textBox3 = "Недопустимый символ";
+                            res.error = true;
+                            sthelp = ""; ihelp = 0;
+                            res.i = i;
+                            res.textBox6 = true;
+                            return res;
+                        }
+                        break;
+                    case State.A33:
+                        if (ch == ' ') break;
+                        if (ch == ':') sta = State.A34;
+                        else
+                        {
+                            sta = State.E;
+                            res.textBox3 = "Недопустимый символ";
+                            res.error = true;
+                            sthelp = ""; ihelp = 0;
+                            res.i = i;
+                            res.textBox6 = true;
+                            return res;
+                        }
+                        break;
+                    case State.A34:
+                        if (ch == '=') sta = State.A35;
+                        else
+                        {
+                            sta = State.E;
+                            res.textBox3 = "Недопустимый символ";
+                            res.error = true;
+                            sthelp = ""; ihelp = 0;
+                            res.i = i;
+                            res.textBox6 = true;
+                            return res;
+                        }
+                        break;
+                    case State.A35:
+                        if (ch == ' ') break;
+                        if ((ch == '_') || (ch >= 'a' && ch <= 'z')) { sta = State.A37; ihelp++; sthelp += ch; break; }
+                        if (ch >= '0' && ch <= '9') { sta = State.A38; sthelp += ch; break; }
+                        if (ch == '-' || ch == '+') { sta = State.A36; }
+                        else
+                        {
+                            sta = State.E;
+                            res.textBox3 = "Ожидался идентификатор или константа";
+                            res.error = true;
+                            sthelp = ""; ihelp = 0;
+                            res.i = i;
+                            res.textBox6 = true;
+                            return res;
+                        }
+                        break;
+                    case State.A36:
+                        if (ch == ' ') break;
+                        if ((ch == '_') || (ch >= 'a' && ch <= 'z')) { sta = State.A37; ihelp++; sthelp += ch; break; }
+                        if (ch >= '0' && ch <= '9') { sta = State.A38; sthelp += ch; }
+                        else
+                        {
+                            sta = State.E;
+                            res.textBox3 = "Ожидался идентификатор или константа";
+                            res.error = true;
+                            sthelp = ""; ihelp = 0;
+                            res.i = i;
+                            res.textBox6 = true;
+                            return res;
+                        }
+                        break;
+                    case State.A37:
+                        if ((ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'z') || (ch == '_') || ch == ' ' || ch == '+' || ch == '-' || ch == '*' || ch == '/' || ch == ';')
+                        {
+                            if ((ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'z') || (ch == '_')) { ihelp++; sthelp += ch; }
+                            if (ihelp > 8)
+                            {
+                                sta = State.E;
+                                res.textBox3 = "Размер идентификатора не должен превышать 8 символов";
+                                res.error = true;
+                                sthelp = ""; ihelp = 0;
+                                res.i = i;
+                                res.textBox6 = true;
+                                return res;
+                            }
+
+                            if (ch == ' ')
+                            {
+                                if (sthelp == "for" || sthelp == "div" || sthelp == "to" || sthelp == "downto" || sthelp == "do" || sthelp == "mod")
+                                {
+                                    sta = State.E;
+                                    res.textBox3 = "Идентификатор не может быть зарезервированным словом";
+                                    res.error = true;
+                                    sthelp = ""; ihelp = 0;
+                                    res.i = i;
+                                    res.textBox6 = true;
+                                    return res;
+                                }
+                                else
+                                {
+                                    sta = State.A39; sthelp = ""; ihelp = 0; ii++;
+                                }
+                            }
+                            if (ch == '+' || ch == '-' || ch == '*' || ch == '/')
+                            {
+                                if (sthelp == "for" || sthelp == "div" || sthelp == "to" || sthelp == "downto" || sthelp == "do" || sthelp == "mod")
+                                {
+                                    sta = State.E;
+                                    res.textBox3 = "Идентификатор не может быть зарезервированным словом";
+                                    res.error = true;
+                                    sthelp = ""; ihelp = 0;
+                                    res.i = i;
+                                    res.textBox6 = true;
+                                    return res;
+                                }
+                                else
+                                {
+                                    sta = State.A36; sthelp = ""; ihelp = 0; ii++;
+                                }
+                            }
+                            if (ch == ';')
+                            {
+                                if (sthelp == "for" || sthelp == "div" || sthelp == "to" || sthelp == "downto" || sthelp == "do" || sthelp == "mod")
+                                {
+                                    sta = State.E;
+                                    res.textBox3 = "Идентификатор не может быть зарезервированным словом";
+                                    res.error = true;
+                                    sthelp = ""; ihelp = 0;
+                                    res.i = i;
+                                    res.textBox6 = true;
+                                    return res;
+                                }
+                                else
+                                {
+                                    if ((init == -50000) || (final == -50000))
+                                    {
+                                        sta = State.F; sthelp = ""; ihelp = 0; ii++;
+                                        res.textBox3 = "Цепочка принадлежит языку";
+                                        res.textBox4 = "Количество идентификаторов= " + ii;
+                                        res.textBox5 = "Количество констант= " + ic;
+                                        return res;
+                                    }
+                                    else
+                                    {
+                                        if(sth=="to")
+                                        {
+                                            if(init<=final)
+                                            {
+                                                sta = State.F; sthelp = ""; ihelp = 0; ii++;
+                                                res.textBox3 = "Цепочка принадлежит языку";
+                                                res.textBox4 = "Количество идентификаторов= " + ii;
+                                                res.textBox5 = "Количество констант= " + ic;
+                                                res.ci = final- init+1;
+                                                return res;
+                                            }
+                                            else
+                                            {
+                                                sta = State.E;
+                                                res.textBox3 = "Неправильные константные выражения для to";
+                                                res.error = true;
+                                                sthelp = ""; ihelp = 0;
+                                                res.i = i;
+                                                res.textBox6 = true;
+                                                return res;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            if (init >= final)
+                                            {
+                                                sta = State.F; sthelp = ""; ihelp = 0; ii++;
+                                                res.textBox3 = "Цепочка принадлежит языку";
+                                                res.textBox4 = "Количество идентификаторов= " + ii;
+                                                res.textBox5 = "Количество констант= " + ic;
+                                                res.ci = init - final+1;
+                                                return res;
+                                            }
+                                            else
+                                            {
+                                                sta = State.E;
+                                                res.textBox3 = "Неправильные константные выражения для downto";
+                                                res.error = true;
+                                                sthelp = ""; ihelp = 0;
+                                                res.i = i;
+                                                res.textBox6 = true;
+                                                return res;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            sta = State.E;
+                            res.textBox3 = "Недопустимый символ";
+                            res.error = true;
+                            sthelp = ""; ihelp = 0;
+                            res.i = i;
+                            res.textBox6 = true;
+                            return res;
+                        }
+                        break;
+                    case State.A38:
+                        if (ch >= '0' && ch <= '9') { sthelp += ch; break; }
+                        if (ch == ' ')
+                        {
+                            if (Int32.Parse(sthelp) >= 0 && Int32.Parse(sthelp) <= 65535)
+                            {
+                                sta = State.A39; sthelp = ""; ic++;
+                            }
+                            break;
+                        }
+                        if (ch == '+' || ch == '-' || ch == '*' || ch == '/')
+                        {
+                            if (Int32.Parse(sthelp) >= 0 && Int32.Parse(sthelp) <= 65535)
+                            {
+                                sta = State.A36; sthelp = ""; ic++;
+                            }
+                            break;
+                        }
+                        if (ch == ';')
+                        {
+                            if (sthelp == "for" || sthelp == "div" || sthelp == "to" || sthelp == "downto" || sthelp == "do" || sthelp == "mod")
+                            {
+                                sta = State.E;
+                                res.textBox3 = "Идентификатор не может быть зарезервированным словом";
+                                res.error = true;
+                                sthelp = ""; ihelp = 0;
+                                res.i = i;
+                                res.textBox6 = true;
+                                return res;
+                            }
+                            else
+                            {
+                                if ((init == -50000) || (final == -50000))
+                                {
+                                    sta = State.F; sthelp = ""; ihelp = 0; ii++;
+                                    res.textBox3 = "Цепочка принадлежит языку";
+                                    res.textBox4 = "Количество идентификаторов= " + ii;
+                                    res.textBox5 = "Количество констант= " + ic;
+                                    return res;
+                                }
+                                else
+                                {
+                                    if (sth == "to")
+                                    {
+                                        if (init <= final)
+                                        {
+                                            sta = State.F; sthelp = ""; ihelp = 0; ii++;
+                                            res.textBox3 = "Цепочка принадлежит языку";
+                                            res.textBox4 = "Количество идентификаторов= " + ii;
+                                            res.textBox5 = "Количество констант= " + ic;
+                                            res.ci = final - init +1;
+                                            return res;
+                                        }
+                                        else
+                                        {
+                                            sta = State.E;
+                                            res.textBox3 = "Неправильные константные выражения для to";
+                                            res.error = true;
+                                            sthelp = ""; ihelp = 0;
+                                            res.i = i;
+                                            res.textBox6 = true;
+                                            return res;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (init >= final)
+                                        {
+                                            sta = State.F; sthelp = ""; ihelp = 0; ii++;
+                                            res.textBox3 = "Цепочка принадлежит языку";
+                                            res.textBox4 = "Количество идентификаторов= " + ii;
+                                            res.textBox5 = "Количество констант= " + ic;
+                                            res.ci = init - final +1;
+                                            return res;
+                                        }
+                                        else
+                                        {
+                                            sta = State.E;
+                                            res.textBox3 = "Неправильные константные выражения для downto";
+                                            res.error = true;
+                                            sthelp = ""; ihelp = 0;
+                                            res.i = i;
+                                            res.textBox6 = true;
+                                            return res;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            sta = State.E;
+                            res.textBox3 = "Символ не может содержаться в константном выражении";
+                            res.error = true;
+                            sthelp = ""; ihelp = 0;
+                            res.i = i;
+                            res.textBox6 = true;
+                            return res;
+                        }
+                    case State.A39:
+                        if (ch == ' ') break;
+                        if (ch == 'm') { sta = State.A40; break; }
+                        if (ch == 'd') { sta = State.A43; break; }
+                        if (ch == ';')
+                        {
+                            if ((init == -50000) || (final == -50000))
+                            {
+                                sta = State.F; sthelp = ""; ihelp = 0; ii++;
+                                res.textBox3 = "Цепочка принадлежит языку";
+                                res.textBox4 = "Количество идентификаторов= " + ii;
+                                res.textBox5 = "Количество констант= " + ic;
+                                return res;
+                            }
+                            else
+                            {
+                                if (sth == "to")
+                                {
+                                    if (init <= final)
+                                    {
+                                        sta = State.F; sthelp = ""; ihelp = 0; ii++;
+                                        res.textBox3 = "Цепочка принадлежит языку";
+                                        res.textBox4 = "Количество идентификаторов= " + ii;
+                                        res.textBox5 = "Количество констант= " + ic;
+                                        res.ci = final - init +1;
+                                        return res;
+                                    }
+                                    else
+                                    {
+                                        sta = State.E;
+                                        res.textBox3 = "Неправильные константные выражения для to";
+                                        res.error = true;
+                                        sthelp = ""; ihelp = 0;
+                                        res.i = i;
+                                        res.textBox6 = true;
+                                        return res;
+                                    }
+                                }
+                                else
+                                {
+                                    if (init >= final)
+                                    {
+                                        sta = State.F; sthelp = ""; ihelp = 0; ii++;
+                                        res.textBox3 = "Цепочка принадлежит языку";
+                                        res.textBox4 = "Количество идентификаторов= " + ii;
+                                        res.textBox5 = "Количество констант= " + ic;
+                                        res.ci = init - final +1;
+                                        return res;
+                                    }
+                                    else
+                                    {
+                                        sta = State.E;
+                                        res.textBox3 = "Неправильные константные выражения для downto";
+                                        res.error = true;
+                                        sthelp = ""; ihelp = 0;
+                                        res.i = i;
+                                        res.textBox6 = true;
+                                        return res;
+                                    }
+                                }
+                            }
+                        }
+                        if (ch == '+' || ch == '-' || ch == '*' || ch == '/') sta = State.A36;
+                        else
+                        {
+                            sta = State.E;
+                            res.textBox3 = "Ожидался оператор mod или div";
+                            res.error = true;
+                            sthelp = ""; ihelp = 0;
+                            res.i = i;
+                            res.textBox6 = true;
+                            return res;
+                        }
+                        break;
+                    case State.A40:
+                        if (ch == 'o') sta = State.A41;
+                        else
+                        {
+                            sta = State.E;
+                            res.textBox3 = "Ожидался оператор mod";
+                            res.error = true;
+                            sthelp = ""; ihelp = 0;
+                            res.i = i;
+                            res.textBox6 = true;
+                            return res;
+                        }
+                        break;
+                    case State.A41:
+                        if (ch == 'd') sta = State.A42;
+                        else
+                        {
+                            sta = State.E;
+                            res.textBox3 = "Ожидался оператор mod";
+                            res.error = true;
+                            sthelp = ""; ihelp = 0;
+                            res.i = i;
+                            res.textBox6 = true;
+                            return res;
+                        }
+                        break;
+                    case State.A42:
+                        if (ch == ' ') sta = State.A36;
+                        else
+                        {
+                            sta = State.E;
+                            res.textBox3 = "После служебного слова ожидался пробел";
+                            res.error = true;
+                            sthelp = ""; ihelp = 0;
+                            res.i = i;
+                            res.textBox6 = true;
+                        }
+                        break;
+                    case State.A43:
+                        if (ch == 'i') sta = State.A44;
+                        else
+                        {
+                            sta = State.E;
+                            res.textBox3 = "Ожидался оператор div";
+                            res.error = true;
+                            sthelp = ""; ihelp = 0;
+                            res.i = i;
+                            res.textBox6 = true;
+                            return res;
+                        }
+                        break;
+                    case State.A44:
+                        if (ch == 'v') sta = State.A42;
+                        else
+                        {
+                            sta = State.E;
+                            res.textBox3 = "Ожидался оператор div";
+                            res.error = true;
+                            sthelp = ""; ihelp = 0;
+                            res.i = i;
+                            res.textBox6 = true;
+                            return res;
+                        }
+                        break;
+                }
+
+            }
+            return null;
+        }
+
+
+    }
+}
